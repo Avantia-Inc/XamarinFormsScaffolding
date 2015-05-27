@@ -6,3 +6,4 @@ logs
 /*.suo
 *.suo
 packages
+*.nupkg

@@ -63,27 +63,27 @@ namespace MYPROJECT {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string dateFieldLabel {
+        public static string DateLabel {
             get {
-                return ResourceManager.GetString("dateFieldLabel", resourceCulture);
+                return ResourceManager.GetString("DateLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string entryFieldLabel {
+        public static string EntryLabel {
             get {
-                return ResourceManager.GetString("entryFieldLabel", resourceCulture);
+                return ResourceManager.GetString("EntryLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string multiLineEntryFieldLabel {
+        public static string MultiLineEntryLabel {
             get {
-                return ResourceManager.GetString("multiLineEntryFieldLabel", resourceCulture);
+                return ResourceManager.GetString("MultiLineEntryLabel", resourceCulture);
             }
         }
         
@@ -99,54 +99,54 @@ namespace MYPROJECT {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string pickerFieldLabel {
+        public static string PickerLabel {
             get {
-                return ResourceManager.GetString("pickerFieldLabel", resourceCulture);
+                return ResourceManager.GetString("PickerLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string sliderFieldLabel {
+        public static string SliderLabel {
             get {
-                return ResourceManager.GetString("sliderFieldLabel", resourceCulture);
+                return ResourceManager.GetString("SliderLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string stepperFieldLabel {
+        public static string StepperLabel {
             get {
-                return ResourceManager.GetString("stepperFieldLabel", resourceCulture);
+                return ResourceManager.GetString("StepperLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string switchFieldLabel {
+        public static string SwitchLabel {
             get {
-                return ResourceManager.GetString("switchFieldLabel", resourceCulture);
+                return ResourceManager.GetString("SwitchLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string textFieldLabel {
+        public static string TextLabel {
             get {
-                return ResourceManager.GetString("textFieldLabel", resourceCulture);
+                return ResourceManager.GetString("TextLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string timeFieldLabel {
+        public static string TimeLabel {
             get {
-                return ResourceManager.GetString("timeFieldLabel", resourceCulture);
+                return ResourceManager.GetString("TimeLabel", resourceCulture);
             }
         }
     }

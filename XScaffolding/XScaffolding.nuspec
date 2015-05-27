@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Avantia-Inc/XamarinFormsScaffolding/master/license.txt</licenseUrl>
+    <projectUrl>https://github.com/Avantia-Inc/XamarinFormsScaffolding</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial Build</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>Xamarin Forms Xamarin.Forms Scaffolding C#</tags>
+  </metadata>
+  <files>
+	<file src="Attributes.cs" target="Content\Attributes" />
+    <file src="Views.tt" target="Content\Views" />
+  </files>
+</package>

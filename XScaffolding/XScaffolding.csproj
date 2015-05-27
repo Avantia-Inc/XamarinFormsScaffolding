@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes.cs" />
     <Compile Include="MyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -61,12 +62,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Views.tt</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\XScaffolding.Attributes\XScaffolding.Attributes.csproj">
-      <Project>{08d22f5f-2dec-4d8b-9896-ebccf950f114}</Project>
-      <Name>XScaffolding.Attributes</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

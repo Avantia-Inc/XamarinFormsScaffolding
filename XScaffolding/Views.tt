@@ -9,6 +9,12 @@
 <#@ import namespace="System.Reflection" #>
 <#@ output extension=".cs" #>
 <#
+	/*
+		Edit the values below before running the template
+		YOUR_ASSEMBLY should be the full name of the current assembly where your models are; 
+			if your models are in another assemble then set YOUR_ASSEMBLY to the full name of that assembly
+			then change the line above 'assembly name="$(TargetPath)"' to 'assembly name="$(ProjectDir)$(OutDir)YOUR_REFERENCED_ASSEMBLY.dll"'
+	*/
 	/* EDITABLE OPTIONS */
 	const string YOUR_ASSEMBLY = "XScaffolding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
 	const string YOUR_NAMESPACE = "MYPROJECT.Views";
@@ -137,7 +143,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var placeholderArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Placeholder");
 			var bindPath = "EntryCell.TextProperty";
-			var label = GetLabelValue(fieldName, labelArg); 
+			var label = GetLabelValue(property, labelArg); 
 
 			if (multilineArg.TypedValue.Value == null || (bool)multilineArg.TypedValue.Value == false)
 			{
@@ -172,7 +178,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var fieldName = BuildFieldName(property);
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var textArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Text");
-			var label = GetLabelValue(fieldName, labelArg);
+			var label = GetLabelValue(property, labelArg);
 
 			fieldNames.Add(fieldName);
 			sb.AppendFormat("\n\t\t\tvar {0} = new TextCell {{ Text = {1}, Detail = Model.{2} }};\n", fieldName, label, property.Name);
@@ -186,7 +192,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 		{
 			var fieldName = BuildFieldName(property);
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
-			var label = GetLabelValue(fieldName, labelArg);
+			var label = GetLabelValue(property, labelArg);
 
 			fieldNames.Add(fieldName);
 			sb.AppendFormat("\n\t\t\tvar {0} = new SwitchCell {{ Text = {1} }};\n", fieldName, label);
@@ -203,7 +209,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var fieldName = BuildFieldName(property);
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var optionsArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Options");
-			var label = GetLabelValue(fieldName, labelArg); 
+			var label = GetLabelValue(property, labelArg); 
 
 			fieldNames.Add(fieldName + "View");
 			sb.AppendFormat("\n\t\t\tvar {0} = new Picker {{ Title = {1} }};\n", fieldName, label);
@@ -233,7 +239,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var maxArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Maximum");
 			var minArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Minimum");
-			var label = GetLabelValue(fieldName, labelArg); 
+			var label = GetLabelValue(property, labelArg); 
 			var max = (maxArg.TypedValue.Value == null) ? 100 : maxArg.TypedValue.Value;
 			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
 
@@ -255,7 +261,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var maxArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Maximum");
 			var minArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Minimum");
 			var incArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Increment");
-			var label = GetLabelValue(fieldName, labelArg); 
+			var label = GetLabelValue(property, labelArg); 
 			var max = (maxArg.TypedValue.Value == null) ? 100 : maxArg.TypedValue.Value;
 			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
 			var inc = (incArg.TypedValue.Value == null) ? 1 : incArg.TypedValue.Value;
@@ -277,7 +283,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var typeArg = (int)attribute.ConstructorArguments[0].Value;
 			var formatArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Format");
-			var label = GetLabelValue(fieldName, labelArg); 
+			var label = GetLabelValue(property, labelArg); 
 
 			if (typeArg == 0)
 			{
@@ -306,10 +312,10 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			return property.Name.Substring(0, 1).ToLower() + property.Name.Substring(1) + "Field";
 		}
 
-		private string GetLabelValue(string fieldName, CustomAttributeNamedArgument labelArg)
+		private string GetLabelValue(PropertyInfo property, CustomAttributeNamedArgument labelArg)
 		{
 			return (labelArg.TypedValue.Value == null) 
-				? string.Format("{0}.{1}Label", resourceClass, fieldName)
+				? string.Format("{0}.{1}Label", resourceClass, property.Name)
 				: string.Format("{0}.{1}", resourceClass, labelArg.TypedValue.Value);
 		}
 

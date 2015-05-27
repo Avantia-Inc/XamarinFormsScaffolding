@@ -117,34 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="dateFieldLabel" xml:space="preserve">
+  <data name="DateLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="entryFieldLabel" xml:space="preserve">
+  <data name="EntryLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="multiLineEntryFieldLabel" xml:space="preserve">
+  <data name="MultiLineEntryLabel" xml:space="preserve">
     <value />
   </data>
   <data name="MyModelTitle" xml:space="preserve">
     <value>Title</value>
   </data>
-  <data name="pickerFieldLabel" xml:space="preserve">
+  <data name="PickerLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="sliderFieldLabel" xml:space="preserve">
+  <data name="SliderLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="stepperFieldLabel" xml:space="preserve">
+  <data name="StepperLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="switchFieldLabel" xml:space="preserve">
+  <data name="SwitchLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="textFieldLabel" xml:space="preserve">
+  <data name="TextLabel" xml:space="preserve">
     <value />
   </data>
-  <data name="timeFieldLabel" xml:space="preserve">
+  <data name="TimeLabel" xml:space="preserve">
     <value />
   </data>
 </root>

@@ -1,0 +1,321 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="$(TargetPath)" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Collections.ObjectModel" #>
+<#@ import namespace="System.Reflection" #>
+<#@ output extension=".cs" #>
+<#
+	/* EDITABLE OPTIONS */
+	const string YOUR_ASSEMBLY = "XScaffolding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+	const string YOUR_NAMESPACE = "MYPROJECT.Views";
+	const string YOUR_STRING_RESOURCE_CLASS = "MYPROJECT.Resources";
+	/* /EDITABLE OPTIONS */
+
+	var assembly = AppDomain.CurrentDomain.GetAssemblies().Single(a => a.FullName == YOUR_ASSEMBLY);
+	var modelTypes = assembly.GetTypes().Where(t => t.CustomAttributes.Any(c => c.AttributeType.Name == "XScaffoldModelAttribute"));
+	var namespaces = modelTypes.Select (m => m.Namespace).Distinct();
+	var fieldBuilder = new FieldBuilder(YOUR_STRING_RESOURCE_CLASS, this);
+#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xamarin.Forms;
+<# 
+	foreach (var ns in namespaces) 
+	{ 
+#>
+using <#= ns #>;
+
+<# } #>
+
+namespace <#= YOUR_NAMESPACE #>
+{
+<# 
+	foreach (var type in modelTypes) 
+	{ 
+#>
+	public partial class <#= type.Name #>Form : ContentPage
+	{
+		public <#= type.Name #> Model { get; set; }
+
+		public <#= type.Name #>Form()
+		{
+			this.Title = <#= YOUR_STRING_RESOURCE_CLASS #>.<#= type.Name #>Title;
+<#
+foreach (PropertyInfo property in type.GetRuntimeProperties())
+{
+	fieldBuilder.BuildField(property);
+}
+#>
+
+			this.Content = new TableView
+			{
+				Intent = TableIntent.Form,
+				Root = new TableRoot
+				{
+					new TableSection
+					{
+						<# fieldBuilder.WriteAllFields(); #>
+
+					}
+				}
+			};
+		}
+	}
+
+<# } #>
+}
+<#+ 
+
+	public class FieldBuilder
+	{
+		StringBuilder sb = new StringBuilder();
+		IList<string> fieldNames = new List<string>();
+		string resourceClass;
+		Microsoft.VisualStudio.TextTemplating.TextTransformation transformer;
+
+		public FieldBuilder(string resourceClass, Microsoft.VisualStudio.TextTemplating.TextTransformation transformer)
+		{
+			this.resourceClass = resourceClass;
+			this.transformer = transformer;
+		}
+
+		public void WriteAllFields()
+		{
+			transformer.Write(string.Join(", ", fieldNames.ToArray()));
+		}
+
+		public void BuildField(PropertyInfo property)
+		{
+			var attribute = property.CustomAttributes.SingleOrDefault(ca => ca.AttributeType.GetInterface("IEditFieldAttribute") != null);
+			if (attribute == null) return;
+
+			switch (attribute.AttributeType.Name)
+			{
+				case "EntryFieldAttribute":
+					WriteEntryField(property, attribute);
+					break;
+
+				case "TextFieldAttribute":
+					WriteTextField(property, attribute);
+					break;
+
+				case "SwitchFieldAttribute":
+					WriteSwitchField(property, attribute);
+					break;
+
+				case "PickerFieldAttribute":
+					WritePickerField(property, attribute);
+					break;
+
+				case "SliderFieldAttribute":
+					WriteSliderField(property, attribute);
+					break;
+
+				case "StepperFieldAttribute":
+					WriteStepperField(property, attribute);
+					break;
+
+				case "DateTimeFieldAttribute":
+					WriteDateTimeField(property, attribute);
+					break;
+
+				default:
+					// not recognized
+					break;
+			}
+		}
+
+		public void WriteEntryField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var multilineArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Multiline");
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var placeholderArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Placeholder");
+			var bindPath = "EntryCell.TextProperty";
+			var label = GetLabelValue(fieldName, labelArg); 
+
+			if (multilineArg.TypedValue.Value == null || (bool)multilineArg.TypedValue.Value == false)
+			{
+				fieldNames.Add(fieldName);
+
+				sb.AppendFormat("\n\t\t\tvar {0} = new EntryCell {{ Label = {1}", fieldName, label);
+
+				if (placeholderArg.TypedValue.Value != null)
+					sb.AppendFormat(", Placeholder = {0}.{1} ", resourceClass, placeholderArg.TypedValue.Value);
+
+				sb.AppendLine(" };");
+			}
+			else
+			{
+				fieldNames.Add(fieldName + "View");
+				bindPath = "Editor.TextProperty";
+
+				sb.AppendFormat("\n\t\t\tvar {0} = new Editor();\n", fieldName);
+
+				WriteViewCell(fieldName, label);
+			}
+
+			sb.AppendFormat("\t\t\t{0}.SetBinding({1}, new Binding(\"{2}\", BindingMode.TwoWay, source: Model));\n", fieldName, bindPath, property.Name);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WriteTextField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var textArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Text");
+			var label = GetLabelValue(fieldName, labelArg);
+
+			fieldNames.Add(fieldName);
+			sb.AppendFormat("\n\t\t\tvar {0} = new TextCell {{ Text = {1}, Detail = Model.{2} }};\n", fieldName, label, property.Name);
+			
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WriteSwitchField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var label = GetLabelValue(fieldName, labelArg);
+
+			fieldNames.Add(fieldName);
+			sb.AppendFormat("\n\t\t\tvar {0} = new SwitchCell {{ Text = {1} }};\n", fieldName, label);
+
+			sb.AppendFormat("\t\t\t{0}.SetBinding(SwitchCell.OnProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WritePickerField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var optionsArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Options");
+			var label = GetLabelValue(fieldName, labelArg); 
+
+			fieldNames.Add(fieldName + "View");
+			sb.AppendFormat("\n\t\t\tvar {0} = new Picker {{ Title = {1} }};\n", fieldName, label);
+
+			if (optionsArg.TypedValue.Value != null)
+			{
+				var options = (ReadOnlyCollection<CustomAttributeTypedArgument>)optionsArg.TypedValue.Value;
+				foreach (var option in options)
+				{
+					sb.AppendFormat("\t\t\t{0}.Items.Add(\"{1}\");\n", fieldName, option.Value);
+				}
+			}
+
+			sb.AppendFormat("\t\t\t{0}.SelectedIndex = {0}.Items.IndexOf(Model.{1});\n", fieldName, property.Name);
+			sb.AppendFormat("\t\t\t{0}.SelectedIndexChanged += (object sender, EventArgs e) => {{ Model.{1} = {0}.SelectedIndex > -1 ? {0}.Items[{0}.SelectedIndex]: null; }};\n", fieldName, property.Name);
+
+			WriteViewCell(fieldName, label);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WriteSliderField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var maxArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Maximum");
+			var minArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Minimum");
+			var label = GetLabelValue(fieldName, labelArg); 
+			var max = (maxArg.TypedValue.Value == null) ? 100 : maxArg.TypedValue.Value;
+			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
+
+			fieldNames.Add(fieldName + "View");
+			sb.AppendFormat("\n\t\t\tvar {0} = new Slider {{ Minimum = {1}, Maximum = {2} }};\n", fieldName, min, max);
+			sb.AppendFormat("\t\t\t{0}.SetBinding(Slider.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+
+			WriteViewCell(fieldName, label);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WriteStepperField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var maxArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Maximum");
+			var minArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Minimum");
+			var incArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Increment");
+			var label = GetLabelValue(fieldName, labelArg); 
+			var max = (maxArg.TypedValue.Value == null) ? 100 : maxArg.TypedValue.Value;
+			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
+			var inc = (incArg.TypedValue.Value == null) ? 1 : incArg.TypedValue.Value;
+
+			fieldNames.Add(fieldName + "View");
+			sb.AppendFormat("\n\t\t\tvar {0} = new Stepper {{ Increment = {1}, Minimum = {2}, Maximum = {3} }};\n", fieldName, inc, min, max);
+			sb.AppendFormat("\t\t\t{0}.SetBinding(Stepper.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);			
+
+			WriteViewCell(fieldName, label);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		public void WriteDateTimeField(PropertyInfo property, CustomAttributeData attribute)
+		{
+			var fieldName = BuildFieldName(property);
+			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
+			var typeArg = (int)attribute.ConstructorArguments[0].Value;
+			var formatArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Format");
+			var label = GetLabelValue(fieldName, labelArg); 
+
+			if (typeArg == 0)
+			{
+				// date 
+				var format = formatArg.TypedValue.Value == null ? "D" : formatArg.TypedValue.Value;
+				sb.AppendFormat("\n\t\t\tvar {0} = new DatePicker {{ Format = \"{1}\" }};\n", fieldName, format);
+				sb.AppendFormat("\t\t\t{0}.SetBinding(DatePicker.DateProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+			}
+			else
+			{
+				// time
+				var format = formatArg.TypedValue.Value == null ? "T" : formatArg.TypedValue.Value;
+				sb.AppendFormat("\n\t\t\tvar {0} = new TimePicker {{ Format = \"{1}\" }};\n ", fieldName, format);
+				sb.AppendFormat("\t\t\t{0}.SetBinding(TimePicker.TimeProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+			}		
+
+			WriteViewCell(fieldName, label);
+
+			transformer.Write(sb.ToString());
+
+			sb.Clear();
+		}
+
+		private string BuildFieldName(PropertyInfo property)
+		{
+			return property.Name.Substring(0, 1).ToLower() + property.Name.Substring(1) + "Field";
+		}
+
+		private string GetLabelValue(string fieldName, CustomAttributeNamedArgument labelArg)
+		{
+			return (labelArg.TypedValue.Value == null) 
+				? string.Format("{0}.{1}Label", resourceClass, fieldName)
+				: string.Format("{0}.{1}", resourceClass, labelArg.TypedValue.Value);
+		}
+
+		private void WriteViewCell(string fieldName, string label)
+		{
+			sb.AppendFormat("\t\t\tvar {0}View = new ViewCell {{ View = new StackLayout {{ Children = {{ new Label {{ Text = {1} }}, {0} }} }} }};\n", fieldName, label);
+		}
+	}
+#>

@@ -1,16 +1,19 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <id>XamarinFormsScaffolding</id>
+    <version>1.0.0.1</version>
+    <title>Xamarin Forms Scaffolding</title>
+    <authors>Avantia, Inc</authors>
+    <owners>Avantia, inc</owners>
     <licenseUrl>https://raw.githubusercontent.com/Avantia-Inc/XamarinFormsScaffolding/master/license.txt</licenseUrl>
     <projectUrl>https://github.com/Avantia-Inc/XamarinFormsScaffolding</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Initial Build</releaseNotes>
+    <description>Scaffolding entry forms for Xamarin.Forms projects</description>
+    <releaseNotes>
+	  1.0.0.1 Remove project dll and copy code files only
+	  1.0.0.0 Initial Build
+	</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Xamarin Forms Xamarin.Forms Scaffolding C#</tags>
   </metadata>

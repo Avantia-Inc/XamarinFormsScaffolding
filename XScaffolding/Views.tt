@@ -97,6 +97,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 		public void WriteAllFields()
 		{
 			transformer.Write(string.Join(", ", fieldNames.ToArray()));
+			fieldNames.Clear();
 		}
 
 		public void BuildField(PropertyInfo property)

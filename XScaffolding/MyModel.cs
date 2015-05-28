@@ -18,7 +18,7 @@ namespace XScaffolding
 		public string Text { get; set; }
 		[SwitchField]
 		public bool Switch { get; set; }
-		[PickerField(Options=new string[] {"Fred", "Wilma", "Barney", "Betty"})]
+		[PickerField(Options=new string[] {"FredOption", "WilmaOption", "BarneyOption", "BettyOption"})]
 		public string Picker { get; set; }
 		[SliderField(Minimum=1, Maximum=10)]
 		public int Slider { get; set; }

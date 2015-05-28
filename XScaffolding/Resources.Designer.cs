@@ -61,6 +61,24 @@ namespace MYPROJECT {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Barney.
+        /// </summary>
+        public static string BarneyOption {
+            get {
+                return ResourceManager.GetString("BarneyOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Betty.
+        /// </summary>
+        public static string BettyOption {
+            get {
+                return ResourceManager.GetString("BettyOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         public static string DateLabel {
@@ -75,6 +93,15 @@ namespace MYPROJECT {
         public static string EntryLabel {
             get {
                 return ResourceManager.GetString("EntryLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fred.
+        /// </summary>
+        public static string FredOption {
+            get {
+                return ResourceManager.GetString("FredOption", resourceCulture);
             }
         }
         
@@ -147,6 +174,15 @@ namespace MYPROJECT {
         public static string TimeLabel {
             get {
                 return ResourceManager.GetString("TimeLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wilma.
+        /// </summary>
+        public static string WilmaOption {
+            get {
+                return ResourceManager.GetString("WilmaOption", resourceCulture);
             }
         }
     }

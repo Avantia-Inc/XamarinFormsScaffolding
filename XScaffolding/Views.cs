@@ -28,10 +28,10 @@ namespace MYPROJECT.Views
 			switchField.SetBinding(SwitchCell.OnProperty, new Binding("Switch", BindingMode.TwoWay, source: Model));
 
 			var pickerField = new Picker { Title = MYPROJECT.Resources.PickerLabel };
-			pickerField.Items.Add("Fred");
-			pickerField.Items.Add("Wilma");
-			pickerField.Items.Add("Barney");
-			pickerField.Items.Add("Betty");
+			pickerField.Items.Add(MYPROJECT.Resources.FredOption);
+			pickerField.Items.Add(MYPROJECT.Resources.WilmaOption);
+			pickerField.Items.Add(MYPROJECT.Resources.BarneyOption);
+			pickerField.Items.Add(MYPROJECT.Resources.BettyOption);
 			pickerField.SelectedIndex = pickerField.Items.IndexOf(Model.Picker);
 			pickerField.SelectedIndexChanged += (object sender, EventArgs e) => { Model.Picker = pickerField.SelectedIndex > -1 ? pickerField.Items[pickerField.SelectedIndex]: null; };
 			var pickerFieldView = new ViewCell { View = new StackLayout { Children = { new Label { Text = MYPROJECT.Resources.PickerLabel }, pickerField } } };

@@ -219,7 +219,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 				var options = (ReadOnlyCollection<CustomAttributeTypedArgument>)optionsArg.TypedValue.Value;
 				foreach (var option in options)
 				{
-					sb.AppendFormat("\t\t\t{0}.Items.Add(\"{1}\");\n", fieldName, option.Value);
+					sb.AppendFormat("\t\t\t{0}.Items.Add({1}.{2});\n", fieldName, resourceClass, option.Value);
 				}
 			}
 

@@ -4,7 +4,6 @@ using System.Linq;
 using Xamarin.Forms;
 using XScaffolding;
 
-
 namespace MYPROJECT.Views
 {
 	public partial class MyModelForm : ContentPage

@@ -1,4 +1,4 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="$(TargetPath)" #>
@@ -14,6 +14,11 @@
 		YOUR_ASSEMBLY should be the full name of the current assembly where your models are; 
 			if your models are in another assemble then set YOUR_ASSEMBLY to the full name of that assembly
 			then change the line above 'assembly name="$(TargetPath)"' to 'assembly name="$(ProjectDir)$(OutDir)YOUR_REFERENCED_ASSEMBLY.dll"'
+
+		YOUR_NAMESPACE should be the namespace you want your generated views to be under
+
+		YOUR_STRING_RESOURCE_CLASS should be the resource class that contains the strings you want to use for labels and titles for the
+			fields and forms being generated. 
 	*/
 	/* EDITABLE OPTIONS */
 	const string YOUR_ASSEMBLY = "XScaffolding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
@@ -35,7 +40,6 @@ using Xamarin.Forms;
 	{ 
 #>
 using <#= ns #>;
-
 <# } #>
 
 namespace <#= YOUR_NAMESPACE #>
@@ -76,7 +80,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 <# } #>
 }
 <#+ 
-
+	
 	public class FieldBuilder
 	{
 		StringBuilder sb = new StringBuilder();

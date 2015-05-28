@@ -62,16 +62,14 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 }
 #>
 
-			this.Content = new TableView
+			this.Content = new StackLayout
 			{
-				Intent = TableIntent.Form,
-				Root = new TableRoot
+				Orientation = StackOrientation.Vertical,
+				Spacing = 15,
+				Children = 
 				{
-					new TableSection
-					{
-						<# fieldBuilder.WriteAllFields(); #>
+<# fieldBuilder.WriteAllFields(); #>
 
-					}
 				}
 			};
 		}
@@ -83,8 +81,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 	
 	public class FieldBuilder
 	{
-		StringBuilder sb = new StringBuilder();
-		IList<string> fieldNames = new List<string>();
+		IList<string> output = new List<string>();
 		string resourceClass;
 		Microsoft.VisualStudio.TextTemplating.TextTransformation transformer;
 
@@ -96,8 +93,8 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 
 		public void WriteAllFields()
 		{
-			transformer.Write(string.Join(", ", fieldNames.ToArray()));
-			fieldNames.Clear();
+			transformer.Write(string.Join(",\n", output.ToArray()));
+			output.Clear();
 		}
 
 		public void BuildField(PropertyInfo property)
@@ -150,47 +147,35 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var bindPath = "EntryCell.TextProperty";
 			var label = GetLabelValue(property, labelArg); 
 
+			AddFieldToOutput(fieldName, label);
+
 			if (multilineArg.TypedValue.Value == null || (bool)multilineArg.TypedValue.Value == false)
 			{
-				fieldNames.Add(fieldName);
-
-				sb.AppendFormat("\n\t\t\tvar {0} = new EntryCell {{ Label = {1}", fieldName, label);
+				transformer.Write(string.Format("\n\t\t\tvar {0} = new Entry {{ ", fieldName, label));
 
 				if (placeholderArg.TypedValue.Value != null)
-					sb.AppendFormat(", Placeholder = {0}.{1} ", resourceClass, placeholderArg.TypedValue.Value);
+					transformer.Write(string.Format(", Placeholder = {0}.{1} ", resourceClass, placeholderArg.TypedValue.Value));
 
-				sb.AppendLine(" };");
+				transformer.WriteLine(" };");
 			}
 			else
 			{
-				fieldNames.Add(fieldName + "View");
 				bindPath = "Editor.TextProperty";
 
-				sb.AppendFormat("\n\t\t\tvar {0} = new Editor();\n", fieldName);
-
-				WriteViewCell(fieldName, label);
+				transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Editor();", fieldName));
 			}
 
-			sb.AppendFormat("\t\t\t{0}.SetBinding({1}, new Binding(\"{2}\", BindingMode.TwoWay, source: Model));\n", fieldName, bindPath, property.Name);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding({1}, new Binding(\"{2}\", BindingMode.TwoWay, source: Model));", fieldName, bindPath, property.Name));
 		}
 
 		public void WriteTextField(PropertyInfo property, CustomAttributeData attribute)
 		{
 			var fieldName = BuildFieldName(property);
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
-			var textArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Text");
 			var label = GetLabelValue(property, labelArg);
 
-			fieldNames.Add(fieldName);
-			sb.AppendFormat("\n\t\t\tvar {0} = new TextCell {{ Text = {1}, Detail = Model.{2} }};\n", fieldName, label, property.Name);
-			
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			AddFieldToOutput(fieldName, label);
+			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Label {{ Text = Model.{1} }};", fieldName, property.Name));
 		}
 
 		public void WriteSwitchField(PropertyInfo property, CustomAttributeData attribute)
@@ -199,14 +184,10 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var label = GetLabelValue(property, labelArg);
 
-			fieldNames.Add(fieldName);
-			sb.AppendFormat("\n\t\t\tvar {0} = new SwitchCell {{ Text = {1} }};\n", fieldName, label);
+			AddFieldToOutput(fieldName, label);
+			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Switch();", fieldName, label));
 
-			sb.AppendFormat("\t\t\t{0}.SetBinding(SwitchCell.OnProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Switch.IsToggledProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));
 		}
 
 		public void WritePickerField(PropertyInfo property, CustomAttributeData attribute)
@@ -216,26 +197,21 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var optionsArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Options");
 			var label = GetLabelValue(property, labelArg); 
 
-			fieldNames.Add(fieldName + "View");
-			sb.AppendFormat("\n\t\t\tvar {0} = new Picker {{ Title = {1} }};\n", fieldName, label);
+			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Picker();", fieldName, label));
 
 			if (optionsArg.TypedValue.Value != null)
 			{
 				var options = (ReadOnlyCollection<CustomAttributeTypedArgument>)optionsArg.TypedValue.Value;
 				foreach (var option in options)
 				{
-					sb.AppendFormat("\t\t\t{0}.Items.Add({1}.{2});\n", fieldName, resourceClass, option.Value);
+					transformer.WriteLine(string.Format("\t\t\t{0}.Items.Add({1}.{2});", fieldName, resourceClass, option.Value));
 				}
 			}
 
-			sb.AppendFormat("\t\t\t{0}.SelectedIndex = {0}.Items.IndexOf(Model.{1});\n", fieldName, property.Name);
-			sb.AppendFormat("\t\t\t{0}.SelectedIndexChanged += (object sender, EventArgs e) => {{ Model.{1} = {0}.SelectedIndex > -1 ? {0}.Items[{0}.SelectedIndex]: null; }};\n", fieldName, property.Name);
+			transformer.WriteLine(string.Format("\t\t\t{0}.SelectedIndex = {0}.Items.IndexOf(Model.{1});", fieldName, property.Name));
+			transformer.WriteLine(string.Format("\t\t\t{0}.SelectedIndexChanged += (object sender, EventArgs e) => {{ Model.{1} = {0}.SelectedIndex > -1 ? {0}.Items[{0}.SelectedIndex]: null; }};", fieldName, property.Name));
 
-			WriteViewCell(fieldName, label);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			AddFieldToOutput(fieldName, label);
 		}
 
 		public void WriteSliderField(PropertyInfo property, CustomAttributeData attribute)
@@ -248,15 +224,10 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var max = (maxArg.TypedValue.Value == null) ? 100 : maxArg.TypedValue.Value;
 			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
 
-			fieldNames.Add(fieldName + "View");
-			sb.AppendFormat("\n\t\t\tvar {0} = new Slider {{ Minimum = {1}, Maximum = {2} }};\n", fieldName, min, max);
-			sb.AppendFormat("\t\t\t{0}.SetBinding(Slider.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Slider {{ Minimum = {1}, Maximum = {2} }};", fieldName, min, max));
+			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Slider.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));
 
-			WriteViewCell(fieldName, label);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			AddFieldToOutput(fieldName, label);
 		}
 
 		public void WriteStepperField(PropertyInfo property, CustomAttributeData attribute)
@@ -271,15 +242,10 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var min = (minArg.TypedValue.Value == null) ? 0 : minArg.TypedValue.Value;
 			var inc = (incArg.TypedValue.Value == null) ? 1 : incArg.TypedValue.Value;
 
-			fieldNames.Add(fieldName + "View");
-			sb.AppendFormat("\n\t\t\tvar {0} = new Stepper {{ Increment = {1}, Minimum = {2}, Maximum = {3} }};\n", fieldName, inc, min, max);
-			sb.AppendFormat("\t\t\t{0}.SetBinding(Stepper.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);			
+			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Stepper {{ Increment = {1}, Minimum = {2}, Maximum = {3} }};", fieldName, inc, min, max));
+			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Stepper.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));			
 
-			WriteViewCell(fieldName, label);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			AddFieldToOutput(fieldName, label);
 		}
 
 		public void WriteDateTimeField(PropertyInfo property, CustomAttributeData attribute)
@@ -294,22 +260,18 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			{
 				// date 
 				var format = formatArg.TypedValue.Value == null ? "D" : formatArg.TypedValue.Value;
-				sb.AppendFormat("\n\t\t\tvar {0} = new DatePicker {{ Format = \"{1}\" }};\n", fieldName, format);
-				sb.AppendFormat("\t\t\t{0}.SetBinding(DatePicker.DateProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+				transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new DatePicker {{ Format = \"{1}\" }};", fieldName, format));
+				transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(DatePicker.DateProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));
 			}
 			else
 			{
 				// time
 				var format = formatArg.TypedValue.Value == null ? "T" : formatArg.TypedValue.Value;
-				sb.AppendFormat("\n\t\t\tvar {0} = new TimePicker {{ Format = \"{1}\" }};\n ", fieldName, format);
-				sb.AppendFormat("\t\t\t{0}.SetBinding(TimePicker.TimeProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));\n", fieldName, property.Name);
+				transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new TimePicker {{ Format = \"{1}\" }};", fieldName, format));
+				transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(TimePicker.TimeProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));
 			}		
 
-			WriteViewCell(fieldName, label);
-
-			transformer.Write(sb.ToString());
-
-			sb.Clear();
+			AddFieldToOutput(fieldName, label);
 		}
 
 		private string BuildFieldName(PropertyInfo property)
@@ -324,9 +286,9 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 				: string.Format("{0}.{1}", resourceClass, labelArg.TypedValue.Value);
 		}
 
-		private void WriteViewCell(string fieldName, string label)
+		private void AddFieldToOutput(string fieldName, string label)
 		{
-			sb.AppendFormat("\t\t\tvar {0}View = new ViewCell {{ View = new StackLayout {{ Children = {{ new Label {{ Text = {1} }}, {0} }} }} }};\n", fieldName, label);
+			output.Add(string.Format("\t\t\t\t\tnew StackLayout {{ Orientation = StackOrientation.Vertical, Children = {{ new Label {{ Text = {1}, FontAttributes = FontAttributes.Bold }}, {0} }} }}", fieldName, label));
 		}
 	}
 #>

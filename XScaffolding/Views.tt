@@ -62,14 +62,17 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 }
 #>
 
-			this.Content = new StackLayout
+			this.Content = new ScrollView
 			{
-				Orientation = StackOrientation.Vertical,
-				Spacing = 15,
-				Children = 
+				Content = new StackLayout
 				{
+					Orientation = StackOrientation.Vertical,
+					Spacing = 15,
+					Children = 
+					{
 <# fieldBuilder.WriteAllFields(); #>
 
+					}
 				}
 			};
 		}
@@ -226,8 +229,11 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 
 			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Slider {{ Minimum = {1}, Maximum = {2} }};", fieldName, min, max));
 			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Slider.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));
+			transformer.WriteLine(string.Format("\t\t\tvar {0}Detail = new Label {{ Text = Model.{1}.ToString(\"G\"), FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)) }};", fieldName, property.Name));
+			transformer.WriteLine(string.Format("\t\t\t{0}.ValueChanged += (object sender, ValueChangedEventArgs e) => {{ {0}Detail.Text = e.NewValue.ToString(\"G\"); }};", fieldName));
+			transformer.WriteLine(string.Format("\t\t\tvar {0}View = new StackLayout {{ Orientation = StackOrientation.Horizontal, Spacing = 15, Children = {{ {0}, {0}Detail }} }};", fieldName));
 
-			AddFieldToOutput(fieldName, label);
+			AddFieldToOutput(fieldName + "View", label);
 		}
 
 		public void WriteStepperField(PropertyInfo property, CustomAttributeData attribute)
@@ -243,9 +249,12 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var inc = (incArg.TypedValue.Value == null) ? 1 : incArg.TypedValue.Value;
 
 			transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Stepper {{ Increment = {1}, Minimum = {2}, Maximum = {3} }};", fieldName, inc, min, max));
-			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Stepper.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));			
+			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding(Stepper.ValueProperty, new Binding(\"{1}\", BindingMode.TwoWay, source: Model));", fieldName, property.Name));	
+			transformer.WriteLine(string.Format("\t\t\tvar {0}Detail = new Label {{ Text = Model.{1}.ToString(\"G\"), FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)) }};", fieldName, property.Name));
+			transformer.WriteLine(string.Format("\t\t\t{0}.ValueChanged += (object sender, ValueChangedEventArgs e) => {{ {0}Detail.Text = e.NewValue.ToString(\"G\"); }};", fieldName));
+			transformer.WriteLine(string.Format("\t\t\tvar {0}View = new StackLayout {{ Orientation = StackOrientation.Horizontal, Spacing = 15, Children = {{ {0}, {0}Detail }} }};", fieldName));		
 
-			AddFieldToOutput(fieldName, label);
+			AddFieldToOutput(fieldName + "View", label);
 		}
 
 		public void WriteDateTimeField(PropertyInfo property, CustomAttributeData attribute)
@@ -288,7 +297,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 
 		private void AddFieldToOutput(string fieldName, string label)
 		{
-			output.Add(string.Format("\t\t\t\t\tnew StackLayout {{ Orientation = StackOrientation.Vertical, Children = {{ new Label {{ Text = {1}, FontAttributes = FontAttributes.Bold }}, {0} }} }}", fieldName, label));
+			output.Add(string.Format("\t\t\t\t\t\tnew StackLayout {{ Orientation = StackOrientation.Vertical, Children = {{ new Label {{ Text = {1}, FontAttributes = FontAttributes.Bold }}, {0} }} }}", fieldName, label));
 		}
 	}
 #>

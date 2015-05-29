@@ -35,9 +35,15 @@ namespace MYPROJECT.Views
 
 			var sliderField = new Slider { Minimum = 1, Maximum = 10 };
 			sliderField.SetBinding(Slider.ValueProperty, new Binding("Slider", BindingMode.TwoWay, source: Model));
+			var sliderFieldDetail = new Label { Text = Model.Slider.ToString("G"), FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)) };
+			sliderField.ValueChanged += (object sender, ValueChangedEventArgs e) => { sliderFieldDetail.Text = e.NewValue.ToString("G"); };
+			var sliderFieldView = new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 15, Children = { sliderField, sliderFieldDetail } };
 
 			var stepperField = new Stepper { Increment = 1, Minimum = 1, Maximum = 5 };
 			stepperField.SetBinding(Stepper.ValueProperty, new Binding("Stepper", BindingMode.TwoWay, source: Model));
+			var stepperFieldDetail = new Label { Text = Model.Stepper.ToString("G"), FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)) };
+			stepperField.ValueChanged += (object sender, ValueChangedEventArgs e) => { stepperFieldDetail.Text = e.NewValue.ToString("G"); };
+			var stepperFieldView = new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 15, Children = { stepperField, stepperFieldDetail } };
 
 			var dateField = new DatePicker { Format = "D" };
 			dateField.SetBinding(DatePicker.DateProperty, new Binding("Date", BindingMode.TwoWay, source: Model));
@@ -45,21 +51,24 @@ namespace MYPROJECT.Views
 			var timeField = new TimePicker { Format = "T" };
 			timeField.SetBinding(TimePicker.TimeProperty, new Binding("Time", BindingMode.TwoWay, source: Model));
 
-			this.Content = new StackLayout
+			this.Content = new ScrollView
 			{
-				Orientation = StackOrientation.Vertical,
-				Spacing = 15,
-				Children = 
+				Content = new StackLayout
 				{
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.EntryLabel, FontAttributes = FontAttributes.Bold }, entryField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.MultiLineEntryLabel, FontAttributes = FontAttributes.Bold }, multiLineEntryField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TextLabel, FontAttributes = FontAttributes.Bold }, textField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.SwitchLabel, FontAttributes = FontAttributes.Bold }, switchField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.PickerLabel, FontAttributes = FontAttributes.Bold }, pickerField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.SliderLabel, FontAttributes = FontAttributes.Bold }, sliderField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.StepperLabel, FontAttributes = FontAttributes.Bold }, stepperField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.DateLabel, FontAttributes = FontAttributes.Bold }, dateField } },
-					new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TimeLabel, FontAttributes = FontAttributes.Bold }, timeField } }
+					Orientation = StackOrientation.Vertical,
+					Spacing = 15,
+					Children = 
+					{
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.EntryLabel, FontAttributes = FontAttributes.Bold }, entryField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.MultiLineEntryLabel, FontAttributes = FontAttributes.Bold }, multiLineEntryField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TextLabel, FontAttributes = FontAttributes.Bold }, textField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.SwitchLabel, FontAttributes = FontAttributes.Bold }, switchField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.PickerLabel, FontAttributes = FontAttributes.Bold }, pickerField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.SliderLabel, FontAttributes = FontAttributes.Bold }, sliderFieldView } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.StepperLabel, FontAttributes = FontAttributes.Bold }, stepperFieldView } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.DateLabel, FontAttributes = FontAttributes.Bold }, dateField } },
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TimeLabel, FontAttributes = FontAttributes.Bold }, timeField } }
+					}
 				}
 			};
 		}

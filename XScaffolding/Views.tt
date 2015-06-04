@@ -53,7 +53,12 @@ namespace <#= YOUR_NAMESPACE #>
 		public <#= type.Name #> Model { get; set; }
 
 		public <#= type.Name #>Form()
+			: this(new <#= type.Name #>())
+		{ }
+
+		public <#= type.Name #>Form(<#= type.Name #> model)
 		{
+			this.Model = model;
 			this.Title = <#= YOUR_STRING_RESOURCE_CLASS #>.<#= type.Name #>Title;
 <#
 foreach (PropertyInfo property in type.GetRuntimeProperties())
@@ -62,16 +67,20 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 }
 #>
 
+			var submitButton = new Button { Text = <#= YOUR_STRING_RESOURCE_CLASS #>.SubmitLabel };
+			submitButton.Clicked += (object sender, EventArgs e) => { throw new NotImplementedException(); };
+
 			this.Content = new ScrollView
 			{
 				Content = new StackLayout
 				{
 					Orientation = StackOrientation.Vertical,
+					Padding = new Thickness(0, 0, 25, 25),
 					Spacing = 15,
 					Children = 
 					{
-<# fieldBuilder.WriteAllFields(); #>
-
+<# fieldBuilder.WriteAllFields(); #>,
+						submitButton
 					}
 				}
 			};
@@ -165,7 +174,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			{
 				bindPath = "Editor.TextProperty";
 
-				transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Editor();", fieldName));
+				transformer.WriteLine(string.Format("\n\t\t\tvar {0} = new Editor {{ HeightRequest = Device.GetNamedSize(NamedSize.Default, typeof(Editor)) * 10 }};", fieldName));
 			}
 
 			transformer.WriteLine(string.Format("\t\t\t{0}.SetBinding({1}, new Binding(\"{2}\", BindingMode.TwoWay, source: Model));", fieldName, bindPath, property.Name));

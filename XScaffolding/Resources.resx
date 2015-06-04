@@ -147,6 +147,9 @@
   <data name="StepperLabel" xml:space="preserve">
     <value />
   </data>
+  <data name="SubmitLabel" xml:space="preserve">
+    <value>Submit</value>
+  </data>
   <data name="SwitchLabel" xml:space="preserve">
     <value />
   </data>

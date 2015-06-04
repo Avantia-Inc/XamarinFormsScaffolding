@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>XamarinFormsScaffolding</id>
-    <version>1.0.0.2</version>
+    <version>1.0.2.0</version>
     <title>Xamarin Forms Scaffolding</title>
     <authors>Avantia, Inc</authors>
     <owners>Avantia, inc</owners>
@@ -11,6 +11,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Scaffolding entry forms for Xamarin.Forms projects</description>
     <releaseNotes>
+	  1.0.2.0 Generated Models now have an overloaded contructor that accepts the model as a parameter. 
+	          Added a default submit button. 
+			  Added default padding 
+			  Added a default height to Editor
+	  1.0.1.0 Switch layout to use StackLayout rather than TableView. TableView is still too buggy to use. Added labels to display values of slider and stepper controls
 	  1.0.0.2 Fix bug where fields were being copied to all successive classes
 	  1.0.0.1 Remove project dll and copy code files only
 	  1.0.0.0 Initial Build

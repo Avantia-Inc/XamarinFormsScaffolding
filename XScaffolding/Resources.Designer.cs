@@ -151,6 +151,15 @@ namespace MYPROJECT {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Submit.
+        /// </summary>
+        public static string SubmitLabel {
+            get {
+                return ResourceManager.GetString("SubmitLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         public static string SwitchLabel {

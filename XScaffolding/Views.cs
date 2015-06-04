@@ -11,13 +11,18 @@ namespace MYPROJECT.Views
 		public MyModel Model { get; set; }
 
 		public MyModelForm()
+			: this(new MyModel())
+		{ }
+
+		public MyModelForm(MyModel model)
 		{
+			this.Model = model;
 			this.Title = MYPROJECT.Resources.MyModelTitle;
 
 			var entryField = new Entry {  };
 			entryField.SetBinding(EntryCell.TextProperty, new Binding("Entry", BindingMode.TwoWay, source: Model));
 
-			var multiLineEntryField = new Editor();
+			var multiLineEntryField = new Editor { HeightRequest = Device.GetNamedSize(NamedSize.Default, typeof(Editor)) * 10 };
 			multiLineEntryField.SetBinding(Editor.TextProperty, new Binding("MultiLineEntry", BindingMode.TwoWay, source: Model));
 
 			var textField = new Label { Text = Model.Text };
@@ -51,11 +56,15 @@ namespace MYPROJECT.Views
 			var timeField = new TimePicker { Format = "T" };
 			timeField.SetBinding(TimePicker.TimeProperty, new Binding("Time", BindingMode.TwoWay, source: Model));
 
+			var submitButton = new Button { Text = MYPROJECT.Resources.SubmitLabel };
+			submitButton.Clicked += (object sender, EventArgs e) => { throw new NotImplementedException(); };
+
 			this.Content = new ScrollView
 			{
 				Content = new StackLayout
 				{
 					Orientation = StackOrientation.Vertical,
+					Padding = new Thickness(0, 0, 25, 25),
 					Spacing = 15,
 					Children = 
 					{
@@ -67,7 +76,8 @@ namespace MYPROJECT.Views
 						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.SliderLabel, FontAttributes = FontAttributes.Bold }, sliderFieldView } },
 						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.StepperLabel, FontAttributes = FontAttributes.Bold }, stepperFieldView } },
 						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.DateLabel, FontAttributes = FontAttributes.Bold }, dateField } },
-						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TimeLabel, FontAttributes = FontAttributes.Bold }, timeField } }
+						new StackLayout { Orientation = StackOrientation.Vertical, Children = { new Label { Text = MYPROJECT.Resources.TimeLabel, FontAttributes = FontAttributes.Bold }, timeField } },
+						submitButton
 					}
 				}
 			};

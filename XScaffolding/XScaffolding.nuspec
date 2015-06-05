@@ -11,7 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Scaffolding entry forms for Xamarin.Forms projects</description>
     <releaseNotes>
-	  1.0.2.0 Generated Models now have an overloaded contructor that accepts the model as a parameter. 
+	  1.0.2.0 Generated Models now have an overloaded constructor that accepts the model as a parameter. 
 	          Added a default submit button. 
 			  Added default padding 
 			  Added a default height to Editor

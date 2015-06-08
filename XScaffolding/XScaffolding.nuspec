@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>XamarinFormsScaffolding</id>
-    <version>1.0.2.0</version>
+    <version>1.0.2.1</version>
     <title>Xamarin Forms Scaffolding</title>
     <authors>Avantia, Inc</authors>
     <owners>Avantia, inc</owners>
@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Scaffolding entry forms for Xamarin.Forms projects</description>
     <releaseNotes>
+	  1.0.2.1 Bug fix: Entry databinding was using EntryCell Text Binding
 	  1.0.2.0 Generated Models now have an overloaded constructor that accepts the model as a parameter. 
 	          Added a default submit button. 
 			  Added default padding 

@@ -20,7 +20,7 @@ namespace MYPROJECT.Views
 			this.Title = MYPROJECT.Resources.MyModelTitle;
 
 			var entryField = new Entry {  };
-			entryField.SetBinding(EntryCell.TextProperty, new Binding("Entry", BindingMode.TwoWay, source: Model));
+			entryField.SetBinding(Entry.TextProperty, new Binding("Entry", BindingMode.TwoWay, source: Model));
 
 			var multiLineEntryField = new Editor { HeightRequest = Device.GetNamedSize(NamedSize.Default, typeof(Editor)) * 10 };
 			multiLineEntryField.SetBinding(Editor.TextProperty, new Binding("MultiLineEntry", BindingMode.TwoWay, source: Model));

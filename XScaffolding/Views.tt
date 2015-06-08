@@ -156,7 +156,7 @@ foreach (PropertyInfo property in type.GetRuntimeProperties())
 			var multilineArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Multiline");
 			var labelArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Label");
 			var placeholderArg = attribute.NamedArguments.SingleOrDefault (na => na.MemberName == "Placeholder");
-			var bindPath = "EntryCell.TextProperty";
+			var bindPath = "Entry.TextProperty";
 			var label = GetLabelValue(property, labelArg); 
 
 			AddFieldToOutput(fieldName, label);
